@@ -28,6 +28,7 @@ def main():
     parser.add_argument("--results-dir", type=Path, default=ROOT / "results")
     parser.add_argument("--models", default="gpt-4o-mini", help="Comma-separated model names")
     parser.add_argument("--limit", type=int, default=None, help="Max rows per tone (for quick test)")
+    parser.add_argument("--regenerate", action="store_true", help="Regenerate tone datasets from --datasets-dir even if datasets_by_tone already exists (use when switching from sample to full data)")
     parser.add_argument("--base-url", default=None, help="Local OpenAI-compatible API URL (e.g. http://localhost:11434/v1 for Ollama). No paid API key needed.")
     parser.add_argument("--plot-only", action="store_true", help="Skip inference; plot from existing results")
     parser.add_argument("--results", type=Path, nargs="*", help="Result JSONL files for --plot-only (e.g. results/*.jsonl)")
@@ -49,8 +50,12 @@ def main():
         print(f"Figure saved to {args.figure}")
         return
 
-    # 1. Generate tone datasets if missing
-    if not (args.out_dir / "answer").exists() or not list((args.out_dir / "answer").glob("*.jsonl")):
+    # 1. Generate tone datasets if missing or --regenerate
+    need_generate = args.regenerate or not (args.out_dir / "answer").exists() or not list((args.out_dir / "answer").glob("*.jsonl"))
+    if need_generate:
+        if args.regenerate and (args.out_dir / "answer").exists():
+            for f in (args.out_dir / "answer").glob("*.jsonl"):
+                f.unlink()
         print("Generating tone datasets...")
         subprocess.run(
             [sys.executable, str(ROOT / "generate_tone_datasets.py"), "--task", "answer", "--datasets-dir", str(args.datasets_dir), "--out-dir", str(args.out_dir)],

@@ -162,6 +162,17 @@ python run_experiment.py --plot-only --results results/demo_results.jsonl
 
 Label clearly in your report that these results are simulated.
 
+### Option 3: Google Colab with GPU
+
+To run the full experiment on a Colab **GPU** (faster than local CPU), use the included notebook:
+
+1. Open **Google Colab**, then **File → Upload notebook** and choose `colab_run_experiment_gpu.ipynb` from this repo (or open the notebook from your cloned repo).
+2. Set **Runtime → Change runtime type → GPU** (e.g. T4) and save.
+3. Upload this repo to Colab: zip the `sycophancy-tone-extension` folder, upload the zip in the Colab Files panel (left sidebar), then in the notebook run: `!unzip -q sycophancy-tone-extension.zip -d /content` (and set `ROOT = Path("/content/sycophancy-tone-extension")` if needed).
+4. Run the notebook cells **in order**. The first cells install Ollama, start the server, pull a model, and clone meg-tong/sycophancy-eval. **Run the “Verify Ollama is reachable” cell** before the experiment cell; if it fails, re-run the install and “Pull a model” cells (Ollama must be running in the same session). Then run the experiment cell. Download `results/sycophancy_by_tone.html` and `results/summary_by_tone.json` from the Files panel, or copy the `results/` folder to Google Drive.
+
+**If every result shows `[Error: Connection error.]`:** The inference script could not reach Ollama. In Colab, run the cells in order in one session: (1) Install Ollama and start server, (2) Pull a model, (3) Clone repos, (4) **Verify Ollama is reachable** (this cell must succeed), (5) Run experiment. Do not restart the runtime between starting Ollama and running the experiment.
+
 ## Citation
 
 If you use the original SycophancyEval data or code, cite:

@@ -12,6 +12,7 @@ Usage:
 import argparse
 import json
 import os
+import time
 from pathlib import Path
 
 try:
@@ -93,11 +94,21 @@ def run_inference(model_name: str, datasets_dir: Path, task: str, out_path: Path
             rows = rows[:limit]
         for item in tqdm(rows, desc=f"{task}/{tone}"):
             messages = to_messages(item["prompt"])
-            try:
-                response = model.invoke(messages)
-                content = response.content if hasattr(response, "content") else str(response)
-            except Exception as e:
-                content = f"[Error: {e}]"
+            content = None
+            for attempt in range(3):
+                try:
+                    response = model.invoke(messages)
+                    content = response.content if hasattr(response, "content") else str(response)
+                    break
+                except Exception as e:
+                    err_str = str(e).lower()
+                    if ("connection" in err_str or "connect" in err_str) and attempt < 2:
+                        time.sleep(2 ** attempt)
+                        continue
+                    content = f"[Error: {e}]"
+                    break
+            if content is None:
+                content = "[Error: connection failed after retries]"
             meta = item.get("metadata", {})
             out = {
                 "model": model_name,
