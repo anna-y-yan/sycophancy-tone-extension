@@ -30,6 +30,7 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="Max rows per tone (for quick test)")
     parser.add_argument("--regenerate", action="store_true", help="Regenerate tone datasets from --datasets-dir even if datasets_by_tone already exists (use when switching from sample to full data)")
     parser.add_argument("--base-url", default=None, help="Local OpenAI-compatible API URL (e.g. http://localhost:11434/v1 for Ollama). No paid API key needed.")
+    parser.add_argument("--concurrency", type=int, default=1, help="Parallel requests for inference (use 16-64 with Ollama/vLLM for speedup)")
     parser.add_argument("--plot-only", action="store_true", help="Skip inference; plot from existing results")
     parser.add_argument("--results", type=Path, nargs="*", help="Result JSONL files for --plot-only (e.g. results/*.jsonl)")
     parser.add_argument("--figure", type=Path, default=ROOT / "results" / "sycophancy_by_tone.html", help="Output figure (use .html to avoid matplotlib)")
@@ -78,6 +79,8 @@ def main():
         cmd += ["--limit", str(args.limit)]
     if args.base_url:
         cmd += ["--base-url", args.base_url]
+    if args.concurrency > 1:
+        cmd += ["--concurrency", str(args.concurrency)]
     print("Running inference (requires API key(s))...")
     subprocess.run(cmd, check=True, cwd=ROOT)
 
