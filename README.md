@@ -173,6 +173,8 @@ To run the full experiment on a Colab **GPU** (faster than local CPU), use the i
 
 **If every result shows `[Error: Connection error.]`:** The inference script could not reach Ollama. In Colab, run the cells in order in one session: (1) Install Ollama and start server, (2) Pull a model, (3) Clone repos, (4) **Verify Ollama is reachable** (this cell must succeed), (5) Run experiment. Do not restart the runtime between starting Ollama and running the experiment.
 
+**Large models (Llama 3.3 70B, Qwen3 235B):** For more capable models, use vLLM instead of Ollama. See **[VLLM_LARGE_MODELS.md](VLLM_LARGE_MODELS.md)** for GPU requirements, multi-GPU setup (`--tensor-parallel-size`), and RunPod/Lambda/cloud options.
+
 ## Citation
 
 If you use the original SycophancyEval data or code, cite:
